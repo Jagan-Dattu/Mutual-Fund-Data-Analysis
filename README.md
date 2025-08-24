@@ -1,18 +1,77 @@
-# 📊 Mutual Fund Overview & Insights
+# 💹 SmartInvest – Mutual Fund Analytics & Insights  
 
-This mutual fund analysis project focuses on identifying top 30 schemes with high return and low risk using Python, Excel, and Power BI.
+This project delivers **data-driven insights** into mutual funds by identifying the **Top 30 best-performing, low-risk schemes** from a dataset of 2500+ funds.  
+The process combines **SQL, Excel, and Power BI** to transform raw financial data into **clear, actionable dashboards**.  
 
-🛠️ **Tools Used:** Python (Pandas, Sklearn), Excel, Power BI  
-📁 **Dataset:** More Than 2500 Mutual Fund Schemes (Top 30 Filtered)
+🛠️ **Tech Stack:** SQL (MySQL), Excel, Power BI  
+📁 **Dataset Size:** 2500+ Mutual Fund Schemes → Final Top 30 Selection  
+
+---
+## 🧠 Project Goal  
+
+To design a **data pipeline** that cleans raw mutual fund data, loads it into a structured **SQL data warehouse**, and visualizes insights through an interactive **Power BI dashboard**.  
 
 ---
 
-## 🧠 Project Goal
+## 🐍 Python + Excel – Data Preparation  
 
-To identify **top-performing, low-risk mutual fund schemes** using data-driven techniques and present insights through a dynamic, professional Power BI dashboard.
+- Cleaned raw dataset (2500+ schemes)  
+- Removed nulls, duplicates, unnecessary columns  
+- Standardized numeric values (returns %, expense ratios, fund size)  
+- Exported **Top 30 Mutual Funds** to Excel for downstream analysis  
+
+📁 **Output:** [Top 30 Mutual Funds (Excel)](./top_30_mutual_funds.xlsx)  
 
 ---
 
+## 🗄️ SQL Data Warehouse Design  
+
+The cleaned data was loaded into **MySQL** and structured using a **star schema** for analytics.  
+
+### 🔹 Database: `mf_analytics`  
+- **Staging Table:** `stg_mutual_funds` (raw CSV load)  
+- **Dimensions:**  
+  - `dim_amc` → Asset Management Companies  
+  - `dim_category` → Fund categories & sub-categories  
+  - `dim_manager` → Fund managers  
+  - `dim_date` → Date dimension (for snapshots)  
+- **Fact Table:**  
+  - `fact_fund_snapshot` → Core performance & return metrics  
+
+### 🔹 Example KPI Queries  
+
+```sql
+-- Top 5 funds by 3-year return
+SELECT scheme_name, return_3yr
+FROM fact_fund_snapshot
+ORDER BY return_3yr DESC
+LIMIT 5;
+
+-- AMC with highest AUM
+SELECT a.amc_name, SUM(fund_size_cr) AS total_aum
+FROM fact_fund_snapshot f
+JOIN dim_amc a ON f.amc_id = a.amc_id
+GROUP BY a.amc_name
+ORDER BY total_aum DESC
+LIMIT 1;
+
+-- Risk distribution of funds
+SELECT risk_level, COUNT(*) AS fund_count
+FROM stg_mutual_funds
+GROUP BY risk_level;
+```
+
+### SQL Files in Repo:
+
+**01_create_schema.sql** → Database & schema creation
+
+**02_load_staging.sql** → Load raw CSV into staging
+
+**03_transform_star.sql** → Build star schema
+
+**04_views_scoring.sql** → Create analytics-friendly views
+
+**05_kpi_queries.sql** → KPI queries for reporting
 ## 🐍 Python-Based Fund Analysis
 
 I started by importing and exploring a dataset of over 2500 mutual fund schemes.  
@@ -109,16 +168,21 @@ I created a tool that helps both beginners and experts make **data-driven, low-r
 | Python | Data cleaning, scoring, filtering top 30 funds |
 | Excel  | Formatting, validation, supporting data |
 | Power BI | Interactive dashboard and visual storytelling |
+|   SQL    |Data warehouse design, KPI queries |
 
 ---
 
-## 📁 Files in This Repository
+| File                         | Description                   |
+| ---------------------------- | ----------------------------- |
+| `top_30_mutual_funds.xlsx`   | Final top 30 filtered funds   |
+| `01_create_schema.sql`       | Schema creation script        |
+| `02_load_staging.sql`        | Load staging table script     |
+| `03_transform_star.sql`      | Transform data to star schema |
+| `04_views_scoring.sql`       | Views for analysis            |
+| `05_kpi_queries.sql`         | KPI queries                   |
+| `Mutual Fund Dashboard.pbix` | Power BI dashboard            |
+| `Mutual Fund Dashboard.png`  | Dashboard preview image       |
 
-| File | Description |
-|------|-------------|
-| [top_30_mutual_funds.xlsx](https://github.com/niravtrivedi23/Mutual-Fund-Analysis/blob/main/top_30_mutual_funds.xlsx) | Final top 30 filtered mutual funds |
-| [Mutual Fund Dashboard.pbix](https://github.com/niravtrivedi23/Mutual-Fund-Analysis/blob/main/Mutual%20Fund%20Dashboard.pbix) | Power BI dashboard |
-| [Mutual Fund Dashboard.png](https://github.com/niravtrivedi23/Mutual-Fund-Analysis/blob/main/Mutual%20Fund%20Dashboard%20.png) | Dashboard image preview |
 
 ---
 
@@ -126,10 +190,5 @@ I created a tool that helps both beginners and experts make **data-driven, low-r
 
 ### 🙌 Feedback Welcome
 
-Thank you for exploring my Mutual Fund Analysis project!  
-I’m always open to suggestions, improvements, or collaboration ideas.
-
-📩 Feel free to connect with me on [LinkedIn](https://www.linkedin.com/in/trivedi-nirav-a1760424b)  
-📧 Or drop an email: **niravtrivedi069@gmail.com**
 
 Your feedback helps me grow and build better data-driven solutions. Let’s connect and discuss ideas!
